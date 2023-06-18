@@ -1,0 +1,15 @@
+node_modules
+node
+build
+target
+.idea
+*.iml
+dist
+*/target
+/scm-frontend/node/
+/.idea/
+/bs-auth/bs-auth-definition/target/
+/bs-userinfo/bs-userinfo-definition/target/
+/scm-frontend/target/
+/bs-userinfo/bs-userinfo-implementation/data/
+/bs-userinfo/bs-userinfo-implementation/.docker

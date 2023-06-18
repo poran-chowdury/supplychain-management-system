@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+  bs-userinfo:
+    container_name: 'bs-userinfo'
+    image: 'bs-userinfo:1.0'
+    build: ./
+    ports:
+      - '8581:8581'
+    depends_on:
+      - userinfo_db
+      - rabbitmq
+    command: mvn clean spring-boot:run
+    # Pass environment variables to the service
+    environment:
+      # The inside port will be used by the dependent services
+      SPRING_DATASOURCE_URL: jdbc:postgresql://userinfo_db:5432/scm_userinfo
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: secret
+      DDL_AUTO: create-drop
+      RMQ_HOST: rabbitmq
+      RMQ_USER: social_community_user
+      RMQ_PASSWORD: secret
+      SERVER_PORT: 8581
+      ACTIVE_PROFILE: dev
+    networks:
+      - social_medium_network
+    volumes:
+      - ./data:/data
+  userinfo_db:
+    image: 'postgres'
+    container_name: 'userinfo_container'
+    volumes:
+      - ./data:/data
+    ports:
+      - '5433:5432'
+    environment:
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_DB=scm_userinfo'
+    networks:
+      - scm_userinfo_network
+    extra_hosts:
+      - 'scm_userinfo_network:192.168.238.5'
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: social_community_user
+      RABBITMQ_DEFAULT_PASS: secret
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - social_medium_network
+networks:
+  social_medium_network:
+    name: social_medium_network
+    driver: bridge
